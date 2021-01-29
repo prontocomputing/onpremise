@@ -10,9 +10,7 @@ x-sentry-defaults: &sentry_defaults
   image: sentry-onpremise-local
   depends_on:
     - redis
-    - postgres
     - memcached
-    - smtp
     - snuba-api
     - snuba-consumer
     - snuba-outcomes-consumer
@@ -49,12 +47,6 @@ x-snuba-defaults: &snuba_defaults
     # on the host system (or in the .env file)
     SENTRY_EVENT_RETENTION_DAYS:
 services:
-  smtp:
-    <<: *restart_policy
-    image: tianon/exim4
-    volumes:
-      - "sentry-smtp:/var/spool/exim4"
-      - "sentry-smtp-log:/var/log/exim4"
   memcached:
     <<: *restart_policy
     image: "memcached:1.5-alpine"
@@ -67,13 +59,6 @@ services:
       nofile:
         soft: 10032
         hard: 10032
-  postgres:
-    <<: *restart_policy
-    image: "postgres:9.6"
-    environment:
-      POSTGRES_HOST_AUTH_METHOD: "trust"
-    volumes:
-      - "sentry-postgres:/var/lib/postgresql/data"
   zookeeper:
     <<: *restart_policy
     image: "confluentinc/cp-zookeeper:5.5.0"
@@ -252,8 +237,6 @@ services:
 volumes:
   sentry-data:
     external: true
-  sentry-postgres:
-    external: true
   sentry-redis:
     external: true
   sentry-zookeeper:
@@ -265,8 +248,6 @@ volumes:
   sentry-symbolicator:
     external: true
   sentry-secrets:
-  sentry-smtp:
   sentry-zookeeper-log:
   sentry-kafka-log:
-  sentry-smtp-log:
   sentry-clickhouse-log:
